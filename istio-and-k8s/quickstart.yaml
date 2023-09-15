@@ -1,0 +1,266 @@
+##################################################################################################
+# bonus-app-gateway
+##################################################################################################
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: bonus-app-gateway
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - "*"
+---
+# ["cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account"]
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: bonus-app
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - bonus-app-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /coupons
+      route:
+        - destination:
+            host: coupon-service
+            port:
+              number: 3001
+    - match:
+        - uri:
+            prefix: /bonus-booklets
+      route:
+        - destination:
+            host: bonus-booklet-service
+            port:
+              number: 3000
+    - match:
+        - uri:
+            prefix: /receipts
+      route:
+        - destination:
+            host: receipt-service
+            port:
+              number: 3003
+    - match:
+        - uri:
+            exact: /users
+        - uri:
+            prefix: /users
+      route:
+        - destination:
+            host: user-service
+            port:
+              number: 3002
+    - match:
+        - uri:
+            prefix: /benefits
+      route:
+        - destination:
+            host: benefit-service
+            port:
+              number: 3004
+
+##################################################################################################
+# coupon-service
+##################################################################################################
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: coupon-service
+  labels:
+    app: coupon-service
+    service: coupon-service
+spec:
+  ports:
+    - port: 3001
+      name: http
+  selector:
+    app: coupon-service
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: coupon-service
+  labels:
+    account: coupon-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coupon-service
+spec:
+  selector:
+    matchLabels:
+      app: coupon-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: coupon-service
+    spec:
+      serviceAccountName: coupon-service
+      containers:
+        - name: coupon-service
+          image: tabeaschuster/coupon-service
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3001
+
+###################################################################################################
+## receipt-service
+###################################################################################################
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: receipt-service
+  labels:
+    app: receipt-service
+    service: receipt-service
+spec:
+  ports:
+    - port: 3003
+      name: http
+  selector:
+    app: receipt-service
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: receipt-service
+  labels:
+    account: receipt-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: receipt-service
+spec:
+  selector:
+    matchLabels:
+      app: receipt-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: receipt-service
+    spec:
+      serviceAccountName: receipt-service
+      containers:
+        - name: receipt-service
+          image: tabeaschuster/receipt-service
+          imagePullPolicy: Never
+          env:
+            - name: RABBITMQ_HOST
+              value: host.minikube.internal # 192.168.65.2
+          ports:
+            - containerPort: 3003
+##################################################################################################
+# user-service
+##################################################################################################
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  labels:
+    app: user-service
+    service: user-service
+spec:
+  ports:
+    - port: 3002
+      name: http
+  selector:
+    app: user-service
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: user-service
+  labels:
+    account: user-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+  labels:
+    app: user-service
+    version: v1
+spec:
+  selector:
+    matchLabels:
+      app: user-service
+      version: v1
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: user-service
+        version: v1
+    spec:
+      serviceAccountName: user-service
+      containers:
+        - name: user-service
+          image: tabeaschuster/user-service
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3002
+---
+##################################################################################################
+# benefit-service
+##################################################################################################
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: benefit-service
+  labels:
+    app: benefit-service
+    service: benefit-service
+spec:
+  ports:
+    - port: 3004
+      name: http
+  selector:
+    app: benefit-service
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: benefit-service
+  labels:
+    account: benefit-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: benefit-service
+spec:
+  selector:
+    matchLabels:
+      app: benefit-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: benefit-service
+    spec:
+      serviceAccountName: benefit-service
+      containers:
+        - name: benefit-service
+          image: tabeaschuster/benefit-service
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3004

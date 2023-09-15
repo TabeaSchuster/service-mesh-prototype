@@ -1,0 +1,28 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+spec:
+  profile: demo
+  meshConfig:
+    accessLogFile: /dev/stdout
+    enableTracing: true
+    outboundTrafficPolicy:
+      mode: REGISTRY_ONLY # Alternative: ALLOW_ANY
+  components:
+    egressGateways:
+      - name: istio-egressgateway
+        enabled: true
+        k8s:
+          service:
+            ports:
+              - port: 80
+                targetPort: 8080
+                name: http
+              - port: 443
+                targetPort: 8443
+                name: https
+              - port: 7777
+                targetPort: 7777
+                name: mongo
+              - port: 7778
+                targetPort: 7778
+                name: rabbitmq

@@ -1,0 +1,13 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: bonusbooklet-opa
+spec:
+  selector:
+    matchLabels:
+      app: bonus-booklet-service
+  action: CUSTOM
+  provider:
+    name: "opa.local"
+  rules:
+   - {}

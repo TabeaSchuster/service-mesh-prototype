@@ -1,0 +1,12 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: "opa-ingress-policy"
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: opa
+  action: ALLOW
+  rules:
+    - {} # allows all traffic to opa

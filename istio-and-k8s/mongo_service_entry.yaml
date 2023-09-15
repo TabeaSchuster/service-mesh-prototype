@@ -1,0 +1,18 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: mongo
+spec:
+  hosts:
+    - bonusbooklet-mongo.default.svc.cluster.local
+  addresses:
+    - 192.168.49.1
+  ports:
+    - number: 27017 # $MONGODB_PORT
+      name: tcp
+      protocol: TCP
+  location: MESH_EXTERNAL
+  resolution: STATIC
+  endpoints:
+    - address: 192.168.49.1  # if possible on your machine use host.minikube.internal
+

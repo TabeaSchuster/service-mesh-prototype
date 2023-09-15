@@ -1,0 +1,25 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: "benefit-service-policy"
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: benefit-service
+  action: ALLOW
+  rules:
+    - from:
+        - source:
+            principals: [ "cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account" ]
+      to:
+        - operation:
+            methods: ["GET"]
+            paths: ["/benefits/health"]
+    - from:
+        - source:
+            principals: [ "cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account" ]
+      to:
+        - operation:
+            methods: [ "POST" ]
+            paths: [ "/benefits/activation" ]  # /activation?userId={{myUserId}}

@@ -1,0 +1,47 @@
+---
+##################################################################################################
+# benefit-service
+##################################################################################################
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: old-benefit-service
+  labels:
+    app: old-benefit-service
+    service: old-benefit-service
+spec:
+  ports:
+    - port: 3004
+      name: http
+  selector:
+    app: old-benefit-service
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: old-benefit-service
+  labels:
+    account: old-benefit-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: old-benefit-service
+spec:
+  selector:
+    matchLabels:
+      app: old-benefit-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: old-benefit-service
+    spec:
+      serviceAccountName: old-benefit-service
+      containers:
+        - name: old-benefit-service
+          image: tabeaschuster/benefit-service
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3004

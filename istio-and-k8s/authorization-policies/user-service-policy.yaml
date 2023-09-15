@@ -1,0 +1,44 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: "user-service-policy"
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: user-service
+  action: ALLOW
+  rules:
+    - from:
+        - source:
+            principals: [ "cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account" ]
+      to:
+        - operation:
+            methods: [ "POST" ]
+            paths: [ "/users/login" ]
+        - operation:
+            methods: [ "GET" ]
+            paths: [ "/users/health" ]
+        - operation:  # todo JWT check aus service rausnehmen? Ggf an neues token anpassen
+            methods: [ "GET", "PATCH" ]
+            paths: [ "/users/me" ]
+    - from:
+        - source:
+            principals:  [ "cluster.local/ns/default/sa/opa" ]
+      to:
+        - operation:
+            methods: [ "GET" ]
+            paths: [ "/users/users-by-external-service-desk-id/*" ]  # users-by-external-service-desk-id/:externalUserId/
+        - operation:
+            methods: [ "GET" ]
+            paths: [ "/users/*" ]  # users/:userId/
+    - from:
+        - source:
+            principals: [ "cluster.local/ns/default/sa/bonus-booklet-service" ]
+        - source:
+            principals: [ "cluster.local/ns/default/sa/coupon-service" ]
+      to:
+        - operation:
+            methods: [ "GET" ]
+            paths: [ "/users/*" ]  # users/:userId/
+            # maybe for booklet & coupon notPaths: [ "/users/users-by-external-service-desk-id/*" ]

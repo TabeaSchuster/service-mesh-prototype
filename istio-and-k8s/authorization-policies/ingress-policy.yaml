@@ -1,0 +1,75 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: "ingress-allow"
+  namespace: istio-system
+spec:
+  selector:
+    matchLabels:
+      istio: ingressgateway
+  action: ALLOW
+  rules:
+    #    - to:
+    #        - operation:
+    #            paths: ["/bonus-booklets/*"]
+    #    - from:
+    #        - source:
+    #            requestPrincipals:  ["application/application"] #["service-desk-jwt-issuer/service-desk-jwt-issuer"]
+    #            # notRequestPrincipals: ["*"] #  RequestPrincipals: ["$ISS/$SUB"] #  notRequestPrincipals: [ "*" ] #
+    - to:
+        - operation: #bonus-booklets/bb-123/benefits?userId=user-1
+            paths: ["/bonus-booklets/*"]
+    - from: # /benefits/activation requires jwt with specific claim (group benefitGroupLoyaltyPlus)
+        - source:
+            requestPrincipals: [ "application/application" ]
+      when:
+        - key: request.auth.claims[groups]
+          values: [ "benefitGroupLoyaltyPlus" ]
+      to:
+        - operation:
+            paths: [ "/benefits/activation*" ]
+    - from:  # fertig
+        - source:
+            principals:  [ "cluster.local/ns/default/sa/opa" ]
+      to:
+        - operation:
+            methods: [ "GET" ]
+            paths: [ "/users/users-by-external-service-desk-id/*" ]
+    - to:  # fertig
+        - operation:
+            methods: [ "GET" ] # todo maybe remove
+            paths: [ "/users/health"]
+    - to:  # fertig
+        - operation:
+            methods: [ "POST" ]
+            paths: [ "/users/login" ]
+    - from:  # fertig
+        - source:
+            requestPrincipals: ["application/application"]
+      to:
+        - operation:
+            methods: [ "GET" , "PATCH"]
+            paths: [ "/users/me" ]
+    #    - from:
+    ##        - source:
+    ##            principals: [ "cluster.local/ns/default/sa/coupon-service" ]
+    ##        - source:
+    ##            principals: [ "cluster.local/ns/older-services/sa/sleep" ]
+    ##        - source:
+    ##            principals: [ "cluster.local/ns/older-services/sa/httpbin" ]
+    #        - source:
+    #            namespaces: [ "older-services" ]
+    #    - from:
+    #        - source:
+    #            ipBlocks: [ "192.168.49.1" ] # 10.97.53.100"] # 127.0.0.1"] # 192.168.49.1"]  # 192.168.58.1"] # ["192.167.42.3"] # ["192.168.58.1"]   # 10.244.0.1
+    - from:  # fertig
+        - source:
+            requestPrincipals: ["external-checkout-service/external-checkout-service"]
+      to: # 10.244.0.1
+        - operation:
+            methods: [ "POST" ]
+            paths: [ "/receipts/receipts" ] # /receipts/receipts
+    - to:
+        - operation:
+            methods: [ "GET"]
+            paths: ["/receipts/health"]

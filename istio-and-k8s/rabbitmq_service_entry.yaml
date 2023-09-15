@@ -1,0 +1,18 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: rabbitmq
+spec:
+  hosts:
+    - rabbitmq.default.svc.cluster.local
+  addresses:
+    -  192.168.49.1
+  ports:
+    - number: 5672 # PORT
+      name: tcp
+      protocol: TCP
+  location: MESH_EXTERNAL
+  resolution: STATIC
+  endpoints:
+    - address: 192.168.49.1  # if possible on your machine use host.minikube.internal
+

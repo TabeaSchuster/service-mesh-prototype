@@ -1,0 +1,115 @@
+##################################################################################################
+# bonus-booklet-service
+##################################################################################################
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bonus-booklet-service
+  labels:
+    app: bonus-booklet-service
+    service: bonus-booklet-service
+spec:
+  ports:
+    - port: 3000
+      name: http
+  selector:
+    app: bonus-booklet-service
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: bonus-booklet-service
+  labels:
+    account: bonus-booklet-service
+---
+# Define the service entry for the local OPA service on port 9191.
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: local-opa-grpc
+spec:
+  hosts:
+    - "local-opa-grpc.local"
+  endpoints:
+    - address: "127.0.0.1"
+  ports:
+    - name: grpc
+      number: 9191
+      protocol: GRPC
+  resolution: STATIC
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bonus-booklet-service
+spec:
+  selector:
+    matchLabels:
+      app: bonus-booklet-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: bonus-booklet-service
+    spec:
+      serviceAccountName: bonus-booklet-service
+      containers:
+        - name: bonus-booklet-service
+          image: tabeaschuster/bonus-booklet-service # -without-mongo-service
+          #   docker build -f docker/bonus-booklet-service.Dockerfile -t tabeaschuster/bonus-booklet-without-mongo-service .
+          imagePullPolicy: Never
+          env:
+            - name: RABBITMQ_HOST
+              value: host.minikube.internal # 192.168.65.2
+            - name: MONGO_DB_URL
+              value: mongodb://bonus-booklet-service-xy123:bonus-CASE!behave7poesy@host.minikube.internal:27017/test
+            #            - name: MONGO_DB_URL
+            #              value: mongodb://mongodb:27017/test
+            # mongodb://bonusbooklet:bb-secret@bonus-booklet-mongo:27017/test?authSource=test
+            #mongodb://localhost:27017/test
+            #
+            # - name: MONGO_DB_URL
+            #   value: mongodb://bonusbooklet:bb-secret@bonus-booklet-mongo:27017/test?authSource=test&ssl=true
+            # value:  mongodb://admin:password        @localhost:27017/         db
+          ports:
+            - containerPort: 3000
+        - name: opa
+          image: openpolicyagent/opa:latest-envoy
+          securityContext:
+            runAsUser: 1111
+          volumeMounts:
+            - readOnly: true
+              mountPath: /policy
+              name: opa-policy
+          args:
+            - "run"
+            - "--server"
+            - "--addr=localhost:8181"
+            - "--diagnostic-addr=0.0.0.0:8282"
+            - "--set=plugins.envoy_ext_authz_grpc.addr=:9191"
+            - "--set=plugins.envoy_ext_authz_grpc.query=data.envoy.authz.allow"
+            - "--set=decision_logs.console=true"
+            - "--ignore=.*"
+            - "/policy" # main.rego"
+          livenessProbe:
+            httpGet:
+              path: /health?plugins
+              scheme: HTTP
+              port: 8282
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health?plugins
+              scheme: HTTP
+              port: 8282
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: proxy-config
+          configMap:
+            name: proxy-config
+        - name: opa-policy
+          configMap:
+            name: opa-policy

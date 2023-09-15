@@ -1,0 +1,25 @@
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: "coupon-service-policy"
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: coupon-service
+  action: ALLOW
+  rules:
+    - to: # todo remove health endpoint in future, only for test purposes
+        - operation:
+            methods: ["GET"]
+            paths: ["/coupons/health"]
+    - from:
+        - source:
+            principals: [ "cluster.local/ns/default/sa/bonus-booklet-service" ]
+        - source:
+            principals: [ "cluster.local/ns/default/sa/benefit-service" ]
+      to:
+        - operation:
+            methods: [ "POST" ]
+            paths: [ "/coupons/create-coupon/*" ]  # post /create-coupon/:userId
+

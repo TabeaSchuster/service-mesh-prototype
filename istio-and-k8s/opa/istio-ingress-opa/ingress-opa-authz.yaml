@@ -1,0 +1,16 @@
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: ingress-opa
+  namespace: istio-system
+spec:
+  selector:
+    matchLabels:
+      app: istio-ingressgateway # httpbin
+  action: CUSTOM
+  provider:
+    name: "opa.default"
+  rules:
+    - to:
+        - operation:
+            paths: ["/bonus-booklets/*"]

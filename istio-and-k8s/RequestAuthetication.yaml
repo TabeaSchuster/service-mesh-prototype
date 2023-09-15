@@ -1,0 +1,22 @@
+apiVersion: security.istio.io/v1
+kind: RequestAuthentication
+metadata:
+  name: "jwt-ingress"
+  namespace: istio-system
+spec:
+  selector:
+    matchLabels:
+      istio: ingressgateway
+  jwtRules: # in production you might use an authentication server that creates and rotates the client tokens and use jwksUri instead
+    - issuer: "application"
+      forwardOriginalToken: true
+      jwks: |
+        { "keys": [{"e":"AQAB","kid":"application", "kty":"RSA","n":"y24_UndeycDh5e6NHRCAWqpXLsYODLsBKsxfpXaIpfR4xeGA07Vz-yKVAJtMo_gvoY_QuP7x7I0WkTKAv311eLn6dP7MZrbqRbeG0-P26Ep5DF2hh6BS23EQko2dnmYvaX_w0wFwg_s91s0gRVhKb7_WMtIIt4RFTOOi6PbjkTdAOD1ImUBlLjYd5nZsZVo0dYYzYq1S4wG9d9c42r0ame713ej7ys3Ta22ksxPERRgv9w1iXZQOaiiQ2_aBh2bxzgGYkXl_09Wq_vsw6f4NwpA_pW2gXipXEZKXO2PjZWTJPD7IOFuNtLIfvAqwnj1iRyvlcxhhRsF05pkhKiteaw"}]}
+    - issuer: "service-desk-jwt-issuer"
+      forwardOriginalToken: true
+      jwks: |
+        { "keys": [{"e":"AQAB","kid":"service-desk-jwt-issuer", "kty":"RSA","n":"s71_8jfFPZrRuiNTA3Novfac_1sm9-KADfkvbdAa6D_7HNCNzNbTIokyq8mvWXGpla05_REqUErfagupQF07zaDz6EmPErrt62BAe6uQT9e_2iJ6yYx0212DAxR2FH2RLg8ChS3y0B6Qki7bJGRrOJ_k8SnIWYX3cBTXfHN471F0_8sOXlSf8ue-bL8vciq8nXw91IPbKNa7jGcCZDQKL5e7FQSfz47mqpO5u2iUOzV4Rh7P6mLIZSJjNxmkL5cdMN27OSr3aSkPoF0vTpD9feGcRWAvEyaBpoZ4v6AMGjm6CYtp5ZZB5XXFbaFZfD0k0MRS91KEZ9ZQNDF48EJjhw"}]}
+    - issuer: "external-checkout-service"
+      forwardOriginalToken: true
+      jwks: |
+        { "keys": [{"e":"AQAB","kid":"external-checkout-service", "kty":"RSA","n":"s71_8jfFPZrRuiNTA3Novfac_1sm9-KADfkvbdAa6D_7HNCNzNbTIokyq8mvWXGpla05_REqUErfagupQF07zaDz6EmPErrt62BAe6uQT9e_2iJ6yYx0212DAxR2FH2RLg8ChS3y0B6Qki7bJGRrOJ_k8SnIWYX3cBTXfHN471F0_8sOXlSf8ue-bL8vciq8nXw91IPbKNa7jGcCZDQKL5e7FQSfz47mqpO5u2iUOzV4Rh7P6mLIZSJjNxmkL5cdMN27OSr3aSkPoF0vTpD9feGcRWAvEyaBpoZ4v6AMGjm6CYtp5ZZB5XXFbaFZfD0k0MRS91KEZ9ZQNDF48EJjhw"}]}

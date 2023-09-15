@@ -51,7 +51,7 @@ build/Release
 */node_modules
 */*/node_modules
 jspm_packages/
-/opa-auth/OPA/js/node_modules/
+/istio-and-k8s/opa/OPA-with-rego/js/node_modules/
 
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
