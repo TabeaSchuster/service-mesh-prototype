@@ -1,0 +1,18 @@
+{
+  "name": "checkout-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "checkout-service": "node src/index.js",
+    "start": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "got": "^13.0.0",
+    "curl": "^0.1.4"
+  }
+}
