@@ -13,17 +13,11 @@ spec:
         - operation:
             methods: ["GET"]
             paths: ["/receipts/health"]
-    #    - from:
-    #        - source:
-    #            ipBlocks:  ["192.168.49.1"] # 10.97.53.100"] # 127.0.0.1"] # 192.168.49.1"]  # 192.168.58.1"] # ["192.167.42.3"] # ["192.168.58.1"]   # 10.244.0.1
-    -  to: # 10.244.0.1
-         - operation: # todo in zukunft from checkout-service s.u.
+# note for next endpoint:
+# from-condition for requestPrincipal (JWT "external-checkout-service") for next endpoint is already checked in ingress policy
+   # note: service-accounts can be used as principals,
+   # but service-entries cannot be used as principal (like external "checkout-service")
+    -  to:
+         - operation:
              methods: ["POST"]
-             paths: ["/receipts/receipts"] # /receipts/receipts
-#    - from:
-#        - source: # todo geht se statt sa für service entry? # todo: checkout service starten & testen
-#            principals: [ "cluster.local/ns/default/sa/checkout-service" ]
-#      to:
-#        - operation:
-#            methods: [ "POST" ]
-#            paths: [ "*/receipts" ]
+             paths: ["/receipts/receipts"]
