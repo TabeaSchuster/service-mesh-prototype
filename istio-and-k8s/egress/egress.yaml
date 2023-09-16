@@ -11,7 +11,7 @@ spec:
         name: mongo
         protocol: TCP
       hosts:
-        - bonusbooklet-mongo.default.svc.cluster.local # my-mongo.tcp.svc
+        - bonusbooklet-mongo.default.svc.cluster.local
     - port:
         number: 7778 # $EGRESS_GATEWAY_MONGODB_PORT
         name: rabbitmq
@@ -42,14 +42,14 @@ kind: DestinationRule
 metadata:
   name: mongo
 spec:
-  host: bonusbooklet-mongo.default.svc.cluster.local # my-mongo.tcp.svc
+  host: bonusbooklet-mongo.default.svc.cluster.local
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
   name: rabbitmq
 spec:
-  host: rabbitmq.default.svc.cluster.local # my-mongo.tcp.svc
+  host: rabbitmq.default.svc.cluster.local
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
@@ -57,7 +57,7 @@ metadata:
   name: direct-mongo-through-egress-gateway
 spec:
   hosts:
-    - bonusbooklet-mongo.default.svc.cluster.local # my-mongo.tcp.svc
+    - bonusbooklet-mongo.default.svc.cluster.local
   gateways:
     - mesh
     - istio-egressgateway
@@ -66,7 +66,7 @@ spec:
         - gateways:
             - mesh
           destinationSubnets:
-            - 192.168.49.1 # 192.168.58.1/32 # 192.168.65.2/32 #$$MONGODB_IP/32
+            - 192.168.49.1/32  #$MONGODB_IP
           port: 27017 # $MONGODB_PORT
       route:
         - destination:
@@ -80,9 +80,9 @@ spec:
           port: 7777 #$EGRESS_GATEWAY_MONGODB_PORT
       route:
         - destination:
-            host: bonusbooklet-mongo.default.svc.cluster.local # my-mongo.tcp.svc
+            host: bonusbooklet-mongo.default.svc.cluster.local
             port:
-              number:  27017 #$$MONGODB_PORT
+              number:  27017 #$MONGODB_PORT
           weight: 100
 ---
 apiVersion: networking.istio.io/v1alpha3
@@ -91,7 +91,7 @@ metadata:
   name: direct-rabbitmq-through-egress-gateway
 spec:
   hosts:
-    - rabbitmq.default.svc.cluster.local # my-mongo.tcp.svc
+    - rabbitmq.default.svc.cluster.local
   gateways:
     - mesh
     - istio-egressgateway
@@ -100,7 +100,7 @@ spec:
         - gateways:
             - mesh
           destinationSubnets:
-            - 192.168.49.1/32 #  192.168.49.1/32 # 192.168.58.1/32  # 192.168.58.1 # 192.168.65.2/32 #$$MONGODB_IP/32
+            - 192.168.49.1/32  $$MONGODB_IP/32
           port: 5672 # port
       route:
         - destination:
@@ -114,7 +114,7 @@ spec:
           port: 7778 #$EGRESS_GATEWAY_MONGODB_PORT
       route:
         - destination:
-            host: rabbitmq.default.svc.cluster.local # my-mongo.tcp.svc
+            host: rabbitmq.default.svc.cluster.local
             port:
-              number:  5672 #port
+              number:  5672 #rabbitmq-port
           weight: 100
