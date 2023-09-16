@@ -21,12 +21,11 @@ spec:
         - operation:
             methods: [ "POST" ]  # post  /:bonusBookletId/transactions?userId=${userId}
             paths: [ "*/transactions" ] # works
+            # only exact-match, prefix or suffix are supported
             # paths: [ "/bonus-booklets/*/transactions" ] # does not work,
             # community requsted support of wildcards and regex, but these are currently not supported for path from istio
-            # only exact-match, prefix or suffix are supported
             # https://stackoverflow.com/questions/65706467/istio-authorizationpolicy-with-wildcard
             # https://github.com/istio/istio/issues/16585
-            # paths: [ "/bonus-booklets*transactions" ] # does not work
     - to:
         - operation:
             methods: [ "POST" ]

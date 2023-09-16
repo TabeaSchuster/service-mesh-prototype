@@ -19,7 +19,7 @@ spec:
         - operation:
             methods: [ "GET" ]
             paths: [ "/users/health" ]
-        - operation:  # todo JWT check aus service rausnehmen? Ggf an neues token anpassen
+        - operation:
             methods: [ "GET", "PATCH" ]
             paths: [ "/users/me" ]
     - from:
@@ -28,10 +28,10 @@ spec:
       to:
         - operation:
             methods: [ "GET" ]
-            paths: [ "/users/users-by-external-service-desk-id/*" ]  # users-by-external-service-desk-id/:externalUserId/
+            paths: [ "/users/users-by-external-service-desk-id/*" ]  # like users-by-external-service-desk-id/:externalUserId/
         - operation:
             methods: [ "GET" ]
-            paths: [ "/users/*" ]  # users/:userId/
+            paths: [ "/users/*" ]  # like users/:userId/
     - from:
         - source:
             principals: [ "cluster.local/ns/default/sa/bonus-booklet-service" ]
@@ -41,4 +41,4 @@ spec:
         - operation:
             methods: [ "GET" ]
             paths: [ "/users/*" ]  # users/:userId/
-            # maybe for booklet & coupon notPaths: [ "/users/users-by-external-service-desk-id/*" ]
+            # could try to add in the future: maybe for booklet & coupon notPaths: [ "/users/users-by-external-service-desk-id/*" ]
