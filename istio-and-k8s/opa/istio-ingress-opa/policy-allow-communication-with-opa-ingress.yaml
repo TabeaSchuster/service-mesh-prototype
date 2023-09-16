@@ -9,4 +9,4 @@ spec:
       app: opa
   action: ALLOW
   rules:
-    - {} # allows all traffic to opa
+    - {} # allows traffic go to opa service

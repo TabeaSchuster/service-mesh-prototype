@@ -50,25 +50,13 @@ spec:
         - operation:
             methods: [ "GET" , "PATCH"]
             paths: [ "/users/me" ]
-    #    - from:
-    ##        - source:
-    ##            principals: [ "cluster.local/ns/default/sa/coupon-service" ]
-    ##        - source:
-    ##            principals: [ "cluster.local/ns/older-services/sa/sleep" ]
-    ##        - source:
-    ##            principals: [ "cluster.local/ns/older-services/sa/httpbin" ]
-    #        - source:
-    #            namespaces: [ "older-services" ]
-    #    - from:
-    #        - source:
-    #            ipBlocks: [ "192.168.49.1" ] # 10.97.53.100"] # 127.0.0.1"] # 192.168.49.1"]  # 192.168.58.1"] # ["192.167.42.3"] # ["192.168.58.1"]   # 10.244.0.1
     - from:  # fertig
         - source:
             requestPrincipals: ["external-checkout-service/external-checkout-service"]
-      to: # 10.244.0.1
+      to:
         - operation:
             methods: [ "POST" ]
-            paths: [ "/receipts/receipts" ] # /receipts/receipts
+            paths: [ "/receipts/receipts" ]
     - to:
         - operation:
             methods: [ "GET"]
