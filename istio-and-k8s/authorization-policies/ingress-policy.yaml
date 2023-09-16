@@ -9,16 +9,14 @@ spec:
       istio: ingressgateway
   action: ALLOW
   rules:
-
-    #    - to:
-    #        - operation:
-    #            paths: ["/bonus-booklets/*"]
-    #    - from:
-    #        - source:
-    #            requestPrincipals:  ["application/application"] #["service-desk-jwt-issuer/service-desk-jwt-issuer"]
-    #            # notRequestPrincipals: ["*"] #  RequestPrincipals: ["$ISS/$SUB"] #  notRequestPrincipals: [ "*" ] #
 # to bonus-booklet-service
-    - to:
+  # requires jtw-token of type "application"
+  # before this policy, opa-ingress policy-check was performed
+  # and token-exchange to application-token was performed, if service-desk was used
+    - from:
+        - source:
+            requestPrincipals:  ["application/application"]
+      to:
         - operation:
             paths: ["/bonus-booklets/*"]
 # to benefit-service

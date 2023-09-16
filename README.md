@@ -96,3 +96,22 @@ docker build -f docker/benefit-service.Dockerfile -t tabeaschuster/benefit-servi
 
 ###
 
+### JWT 
+create jwt
+ ``` 
+ cd istio-and-k8s/opa/OPA-with-rego/js
+# export env to console
+ source ../.env 
+ # e.g. create service-desk token,
+ # same procedure for application-token and token for external checkout-service
+ # you can provide optional id as parameter for employee / user id
+ node create_service_desk_token.js 648329-893
+ # you can verify ist with
+  node verify_service_desk_token.js <your-token>
+ ```
+
+Use the token as authentication-bearer-token in your request, e.g. by using postman or curl
+Create application token with: node create_application_token.js employee-1 
+Create token for external checkout-service with: node create_token_for_external_checkout_service.js
+
+
