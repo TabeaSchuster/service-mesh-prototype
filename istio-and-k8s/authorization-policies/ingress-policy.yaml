@@ -50,7 +50,7 @@ spec:
         - operation:
             methods: [ "GET" , "PATCH"]
             paths: [ "/users/me" ]
-    - from:  # fertig
+    - from:  # external checkout-service has to identify with JWT
         - source:
             requestPrincipals: ["external-checkout-service/external-checkout-service"]
       to:
