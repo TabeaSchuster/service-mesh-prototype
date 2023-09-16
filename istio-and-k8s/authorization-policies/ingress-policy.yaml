@@ -16,9 +16,11 @@ spec:
     #        - source:
     #            requestPrincipals:  ["application/application"] #["service-desk-jwt-issuer/service-desk-jwt-issuer"]
     #            # notRequestPrincipals: ["*"] #  RequestPrincipals: ["$ISS/$SUB"] #  notRequestPrincipals: [ "*" ] #
+# to bonus-booklet-service
     - to:
-        - operation: #bonus-booklets/bb-123/benefits?userId=user-1
+        - operation:
             paths: ["/bonus-booklets/*"]
+# to benefit-service
     - from: # /benefits/activation requires jwt with specific claim (group benefitGroupLoyaltyPlus)
         - source:
             requestPrincipals: [ "application/application" ]
@@ -28,13 +30,7 @@ spec:
       to:
         - operation:
             paths: [ "/benefits/activation*" ]
-    - from:  # fertig
-        - source:
-            principals:  [ "cluster.local/ns/default/sa/opa" ]
-      to:
-        - operation:
-            methods: [ "GET" ]
-            paths: [ "/users/users-by-external-service-desk-id/*" ]
+# to user-service
     - to:  # fertig
         - operation:
             methods: [ "GET" ] # todo maybe remove
@@ -43,6 +39,13 @@ spec:
         - operation:
             methods: [ "POST" ]
             paths: [ "/users/login" ]
+    - from: # fertig
+        - source:
+            principals: [ "cluster.local/ns/default/sa/opa" ]
+      to:
+        - operation:
+            methods: [ "GET" ]
+            paths: [ "/users/users-by-external-service-desk-id/*" ]
     - from:  # fertig
         - source:
             requestPrincipals: ["application/application"]
@@ -50,6 +53,7 @@ spec:
         - operation:
             methods: [ "GET" , "PATCH"]
             paths: [ "/users/me" ]
+# to receipt-service
     - from:  # external checkout-service has to identify with JWT
         - source:
             requestPrincipals: ["external-checkout-service/external-checkout-service"]
