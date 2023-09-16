@@ -5,9 +5,14 @@ const app = express()
 const port = 3000
 app.use(bodyParser.json())
 
-let MongoClient = require('mongodb').MongoClient
-let url = process.env.MONGO_DB_URL; // "mongodb://host.minikube.internal:27017/test"; // " mongodb://bonusbooklet:bb-secret@bonus-booklet-mongo::27017/test?authSource=test&ssl=true"; // process.env.MONGO_DB_URL
+// This service file contains the following parts:
+    // Establish connection to message queue and subscribe
+    // Read and write to MongoDb Database
+    // Implementation of endpoints and call to other service
 
+
+let MongoClient = require('mongodb').MongoClient
+let url = process.env.MONGO_DB_URL;
 
 let hostUrlCouponService = process.env.COUPON_SERVICE_SERVICE_HOST;
 let portCouponService = process.env.COUPON_SERVICE_SERVICE_PORT_HTTP;
@@ -21,8 +26,8 @@ const validCoupons = [
     {couponId: "82nd8lei-kri3-a92h-kwb3-d90233d783ns", minPoints: 70, couponType: "PercentageCoupon"},
 ]
 
-// const { createConnection} = require('messageQueueSubscription');
-/////////////////////////////////////////////////
+
+// Establish connection to message queue and subscribe
 
 const amqp = require("amqp-connection-manager");
 
@@ -80,7 +85,7 @@ function closeConnections () {
 }
 
 
-//////////////////////////////////////////////////
+// write to database
 async function writeToMongoDB( transaction, transactionId, transactionType) {
 
     // transaction: would do some validation of transaction data, but simplified in prototype
@@ -101,7 +106,7 @@ async function writeToMongoDB( transaction, transactionId, transactionType) {
         const entryExists = await collection.findOne({ user: transaction.userId });
         console.log(entryExists);
         if ( entryExists===null ) {
-            const result = await collection.insertOne({
+            await collection.insertOne({
                 "user": transaction.userId,
                 "total-points": points,
                 "transactions": [
@@ -109,16 +114,14 @@ async function writeToMongoDB( transaction, transactionId, transactionType) {
                         newTransaction
                     }]
             });
-            // console.log('result', result);
         } else {
-            const result = await collection.updateOne(
+            await collection.updateOne(
                 { user: transaction.userId },
                 {
                     $push: {transactions: newTransaction},
                     $inc: { "total-points": points } // to decrease: use neg value
                 }
             )
-            //  console.log('result', result);
         }
 
     } catch (e) {
@@ -128,6 +131,7 @@ async function writeToMongoDB( transaction, transactionId, transactionType) {
     }
 }
 
+// write to database, redeem points
 async function redeemPointsInMongoDB(userId, points) {
 
     const client = new MongoClient(url);
@@ -171,13 +175,11 @@ async function getUsersBonusbookletDetailsFromMongoDB(userId){
 
         const database = client.db("test");
         const collection = database.collection("bonusbooklet");
-        // const result = await collection.findOne({});
         const bonusbooklet = await collection.findOne({ user: userId });
         console.log('result', bonusbooklet);
         return bonusbooklet;
     } catch (e) {
-        // res.writeHead(500, {'Content-type': 'application/json'})
-        // res.end(JSON.stringify({error: 'could not connect to database'}))
+
         console.log(e)
         return null;
     } finally {
@@ -185,15 +187,13 @@ async function getUsersBonusbookletDetailsFromMongoDB(userId){
     }
 }
 
+// implementation of http-endpoints
+
 app.get( prefix + '/health', (req, res) => {
     res.send('Bonus-Booklet-Service is healthy')
 })
 
-//POST {{baseUrl}}/bonus-booklets/:bonusBookletId/transactions?userId={{myUserId}}
-//       body: {
-//           "points": 100,
-//           "reason": "test points"
-//         }
+
 // /bonus-booklets/${bonusBookletId}/transactions?userId=${userId}
 app.post(prefix + '/:bonusBookletId/transactions', (req, res) => {
     let userId = req.query.userId;
@@ -203,10 +203,6 @@ app.post(prefix + '/:bonusBookletId/transactions', (req, res) => {
 
     // would do some validation here, if this was not a prototype
 
-    // transaction:
-    //      points: number,
-    //      reason: string,
-    //      internalNote?: string
 
     let manualTransaction = {
         "transactionId" : "some-uuid-7",
@@ -225,13 +221,7 @@ app.post(prefix + '/:bonusBookletId/transactions', (req, res) => {
         ' points for reason: '+reason)
 })
 
-// redeem benefit
-//     POST {{baseUrl}}/bonus-booklets/:bonusBookletId/benefits?userId={{myUserId}}
-//       body: {
-//           "couponId": "70ca8a24-0bf5-4127-8b1b-d90233d7369a"
-//         }
 
-// {{baseUrl}}/bonus-booklets/dd4e889f-8725-493c-999B-d9729dbbdac4/benefits?userId={{myUserId}}
 //redeem benefit points to get coupon // claim coupon ("benefit activation")
 app.post(prefix + '/:bonusBookletId/benefits', async (req, res) => {
     let userId = req.query.userId;
@@ -274,24 +264,11 @@ app.post(prefix + '/:bonusBookletId/benefits', async (req, res) => {
             res.writeHead(500, {'Content-type': 'application/json'});
             res.end(JSON.stringify({error: 'Could not update users bonusbooklet'}));
         }
-        // res.writeHead(200, {'Content-type': 'application/json'});
-        // res.end(JSON.stringify({message: 'Created coupon with result '+result}));
     } catch (error) {
         console.error('Error:', error);
         res.writeHead(500, {'Content-type': 'application/json'});
         res.end(JSON.stringify({error: ' Could not create coupon for user with user-id ' + userId + ' and couponId ' + couponId}));
     }
-
-
-
-    //authorization is taken from:
-    //     coupon: {
-    //       contentType: "application/vnd.obi.companion.coupon.post+json;version=2",
-    //       url: "http://localhost:3066",
-    //       authorization: "Bearer for-coupon-service",
-    //     },
-    // body: json with coupon-details, e.g. type: absolut or percentage  // benefit type: CrossCoupon | OnlineCoupon  | StationaryCoupon --> different attributes
-
 
 })
 
@@ -327,11 +304,6 @@ function callCouponService(userId, coupon) {
                 response.on('end', () => {
                     resolve(responseData);
                 });
-
-                //  console.log(JSON.stringify({
-                //                         additionalMessage: 'Hi, called coupon service from bonus-booklet!',
-                //                         body: rawData.toString(),
-                //                     }));
 
             } else {
                 console.log('request', response);

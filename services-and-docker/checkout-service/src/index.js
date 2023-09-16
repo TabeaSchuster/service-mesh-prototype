@@ -6,21 +6,18 @@ const port = 3005
 app.use(bodyParser.json())
 
 
-// todo: beschreiben, dass nicht mit docker sondern direkt mit node (node vorher installieren auf maschiene)
-// todo: cd ba-prototype/checkout-service
-// todo  node src/index.js
-// todo ssh -i ~/.ssh/tschuster_ba ubuntu@3.67.221.220 -N -L 3005:localhost:3005
-
+// This Service will be started directly as node.js apllication on the server
+// go into this directory in the terminal
+// start with  node src/index.js
+// create ssh-connection, if on remote machine, e.g. ssh -i ~/.ssh/tschuster_ba ubuntu@3.67.221.220 -N -L 3005:localhost:3005
+// put in the $INGRESS_HOST etc. of the mesh for the following parameters:
 const prefix = "/checkout";
-let hostUrlReceiptService = "10.97.53.100"//use $INGRESS_HOST // process.env.RECEIPT_SERVICE_SERVICE_HOST; // "10.105.250.85"; //
-let portReceiptService =  "80";//use $INGRESS_PORT //process.env.RECEIPT_SERVICE_SERVICE_PORT_HTTP; //80;
+let hostUrlReceiptService = "10.97.53.100"//use $INGRESS_HOST
+let portReceiptService =  "80";//use $INGRESS_PORT //process.env.RECEIPT_SERVICE_SERVICE_PORT_HTTP;
 let pathReceiptService= "/receipts/receipts";
+// in the future use docker and parameters like process.env.RECEIPT_SERVICE_SERVICE_HOST;
 // -e RECEIPT_SERVICE_SERVICE_HOST="" -e RECEIPT_SERVICE_SERVICE_PORT_HTTP=""
-// "10.97.53.100"; // 80
 
-// TODO beim bau des docker als variable mitgeben? abhängig von gateway api
-// hostname:  hostUrlReceiptService,
-//     port: portReceiptervice,
 
 app.get('/', (req, res) => {
     console.log('debug 11');

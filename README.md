@@ -2,13 +2,11 @@
 ## Prototypical implementation of a service mesh using a representative example from a project by the company Open Reply  
 ## Setup of project and Service-Mesh
 
-# TODO
-- services-and-docker/bonus-booklet-service/src/mongodb-openssl --> kann das weg?
-
-# END_TODO
-
 
 This file contains the steps and terminal commands needed to set up the project and deploy the Istio resources.
+
+A postman collection with example requests for the endpoints can be found at:
+https://elements.getpostman.com/redirect?entityId=22543002-6a71a512-c7a9-4952-ab3b-a3a740927360&entityType=collection
 
 # Installation of docker, istio and minikube
 

@@ -5,9 +5,8 @@ const app = express()
 const port = 3004
 app.use(bodyParser.json())
 
-let portCouponService = process.env.COUPON_SERVICE_SERVICE_PORT_HTTP; //COUPON_SERVICE_SERVICE_PORT_HTTP
-let hostUrlCouponService = process.env.COUPON_SERVICE_SERVICE_HOST; //"http://localhost:3001/health"; //"http://"+hostName+":"+portNumber; //
-// "http://" +
+let portCouponService = process.env.COUPON_SERVICE_SERVICE_PORT_HTTP;
+let hostUrlCouponService = process.env.COUPON_SERVICE_SERVICE_HOST;
 let prefix = "/benefits";
 
 app.get( prefix + '/health', (req, res) => {
@@ -16,7 +15,6 @@ app.get( prefix + '/health', (req, res) => {
     res.send('Benefit-Service is healthy')
 })
 
-// const validVoucherCodes = ["HAMMER-1", "EIMER-2", "NASSSAUGER-3"];
 const validVoucherCodes = [
     {code: "HAMMER-1", couponType: "FreeProduct"},
     {code: "EIMER-2", couponType: "FreeProduct"},
