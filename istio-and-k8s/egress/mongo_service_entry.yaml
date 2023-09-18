@@ -6,7 +6,7 @@ spec:
   hosts:
     - bonusbooklet-mongo.default.svc.cluster.local
   addresses:
-    - 192.168.49.1
+    - 192.168.49.1 # change to ip of your mongo-db
   ports:
     - number: 27017 # $MONGODB_PORT
       name: tcp
@@ -14,5 +14,5 @@ spec:
   location: MESH_EXTERNAL
   resolution: STATIC
   endpoints:
-    - address: 192.168.49.1  # if possible on your machine use host.minikube.internal
+    - address: 192.168.49.1  # change to ip of your mongo-db  # if possible on your machine use host.minikube.internal
 

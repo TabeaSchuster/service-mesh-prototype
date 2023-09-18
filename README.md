@@ -184,10 +184,10 @@ Create token for external checkout-service with: `node create_token_for_external
 
 ## Authorization-Policies
 
-Apply the authorization policies with:
-First deny all traffic.
-``` kubectl apply -f istio-and-k8s/authorization-policies/deny-all-policy.yaml``` 
-Then allow specific traffic
+Apply the authorization policies with:<br><br>
+First deny all traffic.<br>
+``` kubectl apply -f istio-and-k8s/authorization-policies/deny-all-policy.yaml``` <br>
+Then allow specific traffic:
 ```shell
 # for the ingress-gateway
 kubectl apply -f istio-and-k8s/authorization-policies/ingress-policy.yaml

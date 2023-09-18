@@ -6,7 +6,7 @@ spec:
     accessLogFile: /dev/stdout
     enableTracing: true
     outboundTrafficPolicy:
-      mode: REGISTRY_ONLY # Alternative: ALLOW_ANY
+      mode: REGISTRY_ONLY
   components:
     egressGateways:
       - name: istio-egressgateway

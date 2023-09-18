@@ -9,6 +9,29 @@ spec:
       istio: ingressgateway
   action: ALLOW
   rules:
+# to user-service
+    - to:
+        - operation:
+            methods: [ "GET" ]
+            paths: [ "/users/health"]
+    - to:
+        - operation:
+            methods: [ "POST" ]
+            paths: [ "/users/login" ]
+    - from:
+        - source:
+            principals: [ "cluster.local/ns/default/sa/opa" ]
+      to:
+        - operation:
+            methods: [ "GET" ]
+            paths: [ "/users/users-by-external-service-desk-id/*" ]
+    - from:
+        - source:
+            requestPrincipals: ["application/application"]
+      to:
+        - operation:
+            methods: [ "GET" , "PATCH"]
+            paths: [ "/users/me" ]
 # to bonus-booklet-service
   # requires jtw-token of type "application"
   # before this policy, opa-ingress policy-check was performed
@@ -29,29 +52,6 @@ spec:
       to:
         - operation:
             paths: [ "/benefits/activation*" ]
-# to user-service
-    - to:  # fertig
-        - operation:
-            methods: [ "GET" ] # todo maybe remove
-            paths: [ "/users/health"]
-    - to:  # fertig
-        - operation:
-            methods: [ "POST" ]
-            paths: [ "/users/login" ]
-    - from: # fertig
-        - source:
-            principals: [ "cluster.local/ns/default/sa/opa" ]
-      to:
-        - operation:
-            methods: [ "GET" ]
-            paths: [ "/users/users-by-external-service-desk-id/*" ]
-    - from:  # fertig
-        - source:
-            requestPrincipals: ["application/application"]
-      to:
-        - operation:
-            methods: [ "GET" , "PATCH"]
-            paths: [ "/users/me" ]
 # to receipt-service
     - from:  # external checkout-service has to identify with JWT
         - source:

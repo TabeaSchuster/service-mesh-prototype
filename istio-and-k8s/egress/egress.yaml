@@ -100,7 +100,7 @@ spec:
         - gateways:
             - mesh
           destinationSubnets:
-            - 192.168.49.1/32  $$MONGODB_IP/32
+            - 192.168.49.1/32 # $MONGODB_IP/32
           port: 5672 # port
       route:
         - destination:

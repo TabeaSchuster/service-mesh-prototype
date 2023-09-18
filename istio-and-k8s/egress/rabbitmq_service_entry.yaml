@@ -6,13 +6,13 @@ spec:
   hosts:
     - rabbitmq.default.svc.cluster.local
   addresses:
-    -  192.168.49.1
+    -  192.168.49.1  # change to ip of your rabbit-mq
   ports:
-    - number: 5672 # PORT
+    - number: 5672 # PORT Rabbit-MQ
       name: tcp
       protocol: TCP
   location: MESH_EXTERNAL
   resolution: STATIC
   endpoints:
-    - address: 192.168.49.1  # if possible on your machine use host.minikube.internal
+    - address: 192.168.49.1   # change to ip of your rabbit-mq # if possible on your machine use host.minikube.internal
 
